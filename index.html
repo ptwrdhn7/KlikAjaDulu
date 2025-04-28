@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KlikAjaDulu</title>
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      height: 100vh;
+      background: linear-gradient(-45deg, #9ab8ff, #b0bff1, #ebb1de, #ceb2c3);
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+      font-family: 'Poppins', sans-serif;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #fff;
+      padding: 20px;
+    }
+
+    @keyframes gradient {
+      0% {background-position: 0% 50%;}
+      50% {background-position: 100% 50%;}
+      100% {background-position: 0% 50%;}
+    }
+
+    h1 {
+      font-family: 'Great Vibes', cursive;
+      font-size: 3em;
+      margin-bottom: 10px;
+      animation: fadeInDown 2s ease-out forwards;
+    }
+
+    p {
+      font-size: 1.2em;
+      margin-bottom: 20px;
+      animation: fadeIn 3s ease-out forwards;
+    }
+
+    #startButton {
+      padding: 15px 30px;
+      font-size: 1.2em;
+      border: none;
+      border-radius: 50px;
+      background: linear-gradient(to right, #fceabb, #f8b500);
+      color: #333;
+      font-weight: bold;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 20px;
+      z-index: 10;
+    }
+
+    #startButton:hover {
+      transform: scale(1.05);
+    }
+
+    #showMessageButton {
+      padding: 12px 25px;
+      font-size: 1em;
+      border: none;
+      border-radius: 50px;
+      background: linear-gradient(to right, #a8dadc, #457b9d);
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 20px;
+      display: none;
+    }
+
+    #showMessageButton:hover {
+      transform: scale(1.05);
+    }
+
+    .slideshow {
+      display: none;
+      width: 90%;
+      max-width: 400px;
+      height: 500px;
+      overflow: hidden;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      position: relative;
+      background: #fff;
+    }
+
+    .slideshow img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      animation: zoom 5s ease-in-out infinite alternate;
+      border-radius: 20px;
+    }
+
+    @keyframes zoom {
+      0% {transform: scale(1);}
+      100% {transform: scale(1.1);}
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .balloon {
+      position: absolute;
+      width: 40px;
+      height: 60px;
+      background: radial-gradient(circle at 30% 30%, #fff176, #fbc02d);
+      border-radius: 50%;
+      animation: float 10s linear infinite;
+      opacity: 0.7;
+      z-index: 0;
+    }
+
+    @keyframes float {
+      0% {transform: translateY(0) rotate(0);}
+      100% {transform: translateY(-120vh) rotate(360deg);}
+    }
+
+    .message {
+      display: none;
+      margin-top: 30px;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 600px;
+      width: 100%;
+      color: #333;
+    }
+
+    .message p {
+      font-size: 1.2em;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+      h1 { font-size: 2.5em; }
+      p { font-size: 1em; }
+      .slideshow { height: 400px; }
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 2em; }
+      .slideshow { height: 300px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1 id="mainText">Halooo, Adikkuuu💖</h1>
+  <p id="subText">Penasaran Gaa? Klik Tombol Dibawah Ini Yaa!</p>
+
+  <button id="startButton" onclick="startSurprise()">Tombol Kebahagiaan!</button>
+
+  <div class="slideshow" id="slideshow">
+    <img id="slideImage" src="" alt="Kenangan Bahagia">
+  </div>
+
+  <canvas id="confetti"></canvas>
+
+  <div class="message" id="birthdayMessage">
+    <h2>Selamat ulang tahun ke-17, Adikku!</h2>
+    <p id="birthdayDoa"></p>
+  </div>
+
+  <button id="showMessageButton" onclick="showBirthdayMessage()">Tombol Harapan!</button>
+
+  <audio id="birthdaySong" src="happy-birthday-314197.mp3" muted></audio>
+
+<script>
+  const photos = [
+    'foto1.jpg',
+    'foto2.jpg',
+    'foto3.jpg',
+    'foto4.jpg'
+  ];
+
+  const canvas = document.getElementById('confetti');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  function createParticles() {
+    for (let i = 0; i < 150; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 6 + 4,
+        color: `hsl(${Math.random() * 360}, 70%, 60%)`,
+        d: Math.random() * 100
+      });
+    }
+  }
+
+  function drawParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let p of particles) {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+      p.y += Math.cos(p.d) + 1 + p.r/2;
+      p.x += Math.sin(p.d);
+      if (p.y > canvas.height) {
+        p.x = Math.random() * canvas.width;
+        p.y = -10;
+      }
+    }
+    requestAnimationFrame(drawParticles);
+  }
+
+  createParticles();
+
+  function createBalloon() {
+    const balloon = document.createElement('div');
+    balloon.className = 'balloon';
+    balloon.style.left = Math.random() * window.innerWidth + 'px';
+    balloon.style.background = `hsl(${Math.random() * 360}, 80%, 70%)`;
+    balloon.style.animationDuration = (6 + Math.random() * 6) + 's';
+    document.body.appendChild(balloon);
+    setTimeout(() => balloon.remove(), 12000);
+  }
+
+  let slideIndex = 0;
+  function startSlideShow() {
+    const slideshow = document.getElementById('slideshow');
+    const slideImage = document.getElementById('slideImage');
+    slideshow.style.display = 'block';
+    slideImage.src = photos[slideIndex];
+    setInterval(() => {
+      slideIndex = (slideIndex + 1) % photos.length;
+      slideImage.src = photos[slideIndex];
+    }, 3000);
+  }
+
+  function typeWriter(text, elementId, delay = 100) {
+    let i = 0;
+    const element = document.getElementById(elementId);
+    element.innerHTML = "";
+    function typing() {
+      if (i < text.length) {
+        element.innerHTML += text.charAt(i);
+        i++;
+        setTimeout(typing, delay);
+      }
+    }
+    typing();
+  }
+
+  function startSurprise() {
+    document.getElementById('startButton').style.display = 'none';
+    const song = document.getElementById('birthdaySong');
+    song.muted = false;
+    song.play();
+    typeWriter("Happy Sweet Seventeen Adikkuu🎂🎈", "mainText");
+    typeWriter("Cieeee Udah Dewasa Aja Niiih✨", "subText", 50);
+    startSlideShow();
+    drawParticles();
+    setInterval(createBalloon, 800);
+
+    // Show the "Baca Surat Doa" button
+    document.getElementById('showMessageButton').style.display = 'block';
+  }
+
+  function showBirthdayMessage() {
+    document.getElementById('birthdayMessage').style.display = 'block';
+    const birthdayDoa = `
+    Hari ini adalah hari yang istimewa, awal dari perjalananmu yang baru, penuh harapan dan keindahan. Aku berdoa semoga Allah selalu menjaga langkahmu, menerangi hatimu dengan cinta yang tulus, dan membimbingmu menuju masa depan yang penuh berkah.
+    Semoga setiap mimpi yang kamu rajut tumbuh seindah bunga di musim semi, dan setiap langkah yang kamu ambil dipenuhi dengan keberanian, kebijaksanaan, dan kebaikan hati.
+    Di usia yang semakin dewasa ini, aku harap kamu selalu kuat menghadapi tantangan yang datang, tetap rendah hati dalam setiap keberhasilan, dan tak lupa untuk selalu bersyukur dalam setiap kebahagiaan yang menyertaimu.
+    Jadilah pribadi yang tak hanya indah di luar, tetapi juga dalam. Karena dunia ini butuh lebih banyak cahaya seperti yang ada di dalam dirimu.
+    Happy Sweet Seventeen, semoga cinta dan kebahagiaan selalu memelukmu erat hari ini, esok, dan selamanya. 🎉🎂💖
+  `;
+    document.getElementById('birthdayDoa').innerText = birthdayDoa;
+  }
+</script>
+
+</body>
+</html>
